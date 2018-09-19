@@ -10,3 +10,5 @@ libraryDependencies ++= Seq(
 )
 
 enablePlugins(JmhPlugin)
+
+fork in run := true
