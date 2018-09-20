@@ -12,7 +12,7 @@ import scala.concurrent.duration._
 
 /** To run the benchmark from within SBT:
   *
-  * jmh:run -i 20 -wi 10 -f 1 -t 1 benchmarks.SequenceBenchmark
+  * jmh:run -i 15 -wi 10 -f 1 -t 1 benchmarks.SequenceBenchmark
   *
   * Which means "20 iterations", "10 warm-up iterations", "1 forks", "1 thread".
   */
@@ -39,6 +39,13 @@ class SequenceBenchmark {
     val tasks = (0 until 1000).map(_ => IO(1)).toList
     val f: IO[Long] = tasks.sequence.map(_.sum.toLong)
     f.unsafeRunSync
+  }
+
+  @Benchmark
+  def catsParSequenceTask(): Long = {
+    val tasks = (0 until 1000).map(_ => Task.eval(1)).toList
+    val f = tasks.parSequence.map(_.sum.toLong).runAsync
+    Await.result(f, Duration.Inf)
   }
 
   @Benchmark
